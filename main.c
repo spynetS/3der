@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "vector.h"
-#include "donut.c"
-//#include "cube.c"
+//#include "donut.c"
+#include "cube.c"
 
 
 int WIDTH = 40;
@@ -18,7 +18,7 @@ void setCursorPosition(int x, int y) {
     printf("\033[%d;%dH", y+1, x+1);
 }
 
-void setCharAt(int x, int y, char *c) {
+void setCharAt(int x, int y, const char *c) {
     setCursorPosition(x, y);
     printf("%s",c);
 }
@@ -56,7 +56,7 @@ void draw_point_colored(float x_proj, float y_proj, int width, int height, const
     y_pixel = height - 1 - y_pixel; // flip Y for top-left origin
 
 		if(rgb != NULL){
-			char str[64];
+			const char str[64];
 			sprintf(str,"\33[48;2;%d;%d;%dm%s",rgb[0],rgb[1],rgb[2],c);
 			setCharAt(x_pixel, y_pixel, str);
 		} else {
@@ -114,15 +114,27 @@ void render_triangle(float *vertex, int *indices) {
 		/* draw_point(bp[0],bp[1],WIDTH,HEIGHT,"*"); */
 		draw_line(ap[0], ap[1], bp[0], bp[1]);
 	}
-
 }
 
-int main() {
+
+
+// from loader.c
+int load_obj(float *vertices, unsigned int *indices, int *size, const char* path);
+
+int main(int args,char **argv) {
+
+	if(args <= 1) printf("No model provided!\n");
+
+	int size = sizeof(indices)/sizeof(indices[0])/3;
+	
+	/* float *vertices = malloc(sizeof(float) * 4024*4); */
+	/* unsigned int *indices = malloc(sizeof(unsigned int) * 4024*4); */
+	/* load_obj(vertices,indices, &size, argv[1]); */
 
 	printf("\033[2J");
 	draw_point(0, 0, WIDTH, HEIGHT, "@");
-	
-	for(int t = 0; t < sizeof(indices)/sizeof(indices[0])/3; t++) {
+
+	for(int t = 0; t < size; t++) {
 			render_triangle(vertices, &indices[t*3]);
 	}
 	setCursorPosition(0, HEIGHT);

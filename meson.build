@@ -16,6 +16,7 @@ dependencies = [
 sources = [
   'main.c',
   'vector.c',
+  'loader.c',
 ]
 
 exe = executable(

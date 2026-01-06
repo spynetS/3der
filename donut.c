@@ -38,3 +38,5 @@ unsigned int indices[] = {
     14,15,3, 14,3,2,
     15,12,0, 15,0,3
 };
+
+//int size = sizeof(indices)/sizeof(indices[0])/3;
