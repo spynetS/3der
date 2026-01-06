@@ -17,6 +17,7 @@ sources = [
   'main.c',
   'vector.c',
   'loader.c',
+  'renderer.c',
 ]
 
 exe = executable(

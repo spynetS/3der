@@ -8,5 +8,7 @@ float vector_len_squared(float *a, int size);
 void vector_lambda_mult(float *output, float *a, float lambda, int size);
 void vector_add(float *c, float *a, float *b, int size);
 void vector_subtract(float *c, float *a, float *b, int size);
+void vector_cross(float *c, float *a, float *b, int size);
+void vector_normalize(float *c, float *a, int size);
 
 #endif

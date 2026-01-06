@@ -47,3 +47,19 @@ void vector_subtract(float *c, float *a, float *b, int size) {
 		c[i] = a[i]-b[i];
 	}
 }
+
+void vector_cross(float *c, float *u, float *v, int size) {
+	if(size == 3){
+		c[0] = u[1] * v[2] - u[2] * v[1];
+		c[1] = u[2] * v[0] - u[0] * v[2];
+		c[2] = u[0] * v[1] - u[1] * v[0];
+	}	
+}
+
+void vector_normalize(float *c, float *a, int size) {
+	float length = vector_len(a, size);
+	if (length == 0.0f) return; // Avoid division by zero
+	for(int i = 0; i < size; i ++){
+		c[i] = a[i] / length;
+	}
+}
