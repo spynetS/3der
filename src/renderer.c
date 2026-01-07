@@ -10,16 +10,6 @@ double clamp(double d, double min, double max) {
   return t > max ? max : t;
 }
 
-void setCursorPosition(int x, int y) {
-	printf("\033[%d;%dH", y+1, x+1);
-}
-
-void setCharAt(int x, int y, const char *c) {
-	setCursorPosition(x, y);
-	printf("%s",c);
-}
-
-
 void draw_point_colored(float x_proj, float y_proj, int width, int height, char* c, int* rgb) {
 	int scale = 1;
 	int x_pixel = x_proj;
@@ -94,7 +84,7 @@ void to_view(float *c, float *v, Camera *camera) {
 	vector_subtract(c, v, camera->camera_pos,3);
 }
 
-void render_triangle(Renderer *renderer, Triangle *triangle) {
+void render_triangle(Canvas *canvas, Renderer *renderer, Triangle *triangle) {
 
 	float tri[3][4];
 	
@@ -153,7 +143,8 @@ void render_triangle(Renderer *renderer, Triangle *triangle) {
 					color[1] = (int)((1.0f - z) * 255);
 					color[2] =(int)((1.0f - z) * 255);
 					
-					draw_point_colored(x, y, renderer->width, renderer->height, " ", color);
+					//					draw_point_colored(x, y, renderer->width, renderer->height, " ", color);
+					set_pixel(canvas, x, y, color[0], color[1], color[2]);
 				}
 			}
     }

@@ -6,10 +6,10 @@
 //#include "donut.c"
 //#include "cube.c"
 #include "renderer.h"
+#include "canvas.h"
 
-
-#define WIDTH  120*2
-#define HEIGHT 60*2
+#define WIDTH  120
+#define HEIGHT 60
 
 // from loader.c
 int load_obj(float *vertices, unsigned int *indices, int *size, const char* path);
@@ -32,19 +32,6 @@ void init_cam(Camera *camera){
 	camera->camera_up[0] = 0;
 	camera->camera_up[1] = 1;
 	camera->camera_up[2] = 0;
-
-	
-	/* camera->rot[0] = -20 * (M_PI / 180.0f); */
-	/* camera->rot[1] = 0; */
-	/* camera->rot[2] = -100 * (M_PI / 180.0f); */
-
-	/* float forward[3]; */
-	/* forward[0] = -sin(camera->rot[2]) * cos(camera->rot[0]); // X */
-	/* forward[1] =  sin(camera->rot[0]);             // Y */
-	/* forward[2] = -cos(camera->rot[2]) * cos(camera->rot[0]); // Z */
-	
-	//vector_add(camera->camera_target, camera->camera_pos, forward, 3);
-
 }
 
 void init_renderer(Renderer *renderer){
@@ -61,11 +48,13 @@ void init_renderer(Renderer *renderer){
 			renderer->depth_buffer[y][x] = INFINITY;
 		}
 	}
-
 }
 
 int main(int args,char **argv) {
 
+
+
+	
 	if(args <= 1) printf("No model provided!\n");
 
 	float *vertices = malloc(sizeof(float) * 4024*4);
@@ -74,18 +63,21 @@ int main(int args,char **argv) {
 	int size = 0;
 	load_obj(vertices,indices, &size, argv[1]);
 
-	/* int size = sizeof(indices)/sizeof(indices[0])/3; */
-	system("clear");
-	draw_point(0, 0, WIDTH, HEIGHT, "@");
+	//	int size = sizeof(indices)/sizeof(indices[0])/3;
+	//	system("clear");
+	//	draw_point(0, 0, WIDTH, HEIGHT, "@");
 
 	Renderer renderer = {0};
+  init_renderer(&renderer);
 	init_cam(&renderer.camera);
 
+	Canvas *canvas = new_canvas(WIDTH, HEIGHT);
+		
 	while(1){
 		setCursorPosition(0, 0);
 		init_renderer(&renderer);
-		printf("\x1b[0m");
-		system("clear");
+		//		system("clear");
+		clear(canvas);
 		
 		for(int t = 0; t < size; t++) {
 			Triangle triangle = {0};
@@ -109,7 +101,7 @@ int main(int args,char **argv) {
 			triangle.v2[1] = vertices[i2*3 + 1];
 			triangle.v2[2] = vertices[i2*3 + 2];
 
-			render_triangle(&renderer, &triangle);
+			render_triangle(canvas, &renderer, &triangle);
 		}
 
 		if(kbhit()){
@@ -135,16 +127,16 @@ int main(int args,char **argv) {
 				break;
 			}
 		}
-		
+		render(canvas);
 		msleep(16);
 	}
 
-	setCursorPosition(0, HEIGHT);
+	//	setCursorPosition(0, HEIGHT);
 
-	for(int y = 0; y < HEIGHT; y++) {
-    free(renderer.depth_buffer[y]);
-	}
-	free(renderer.depth_buffer);
-	
+	/* for(int y = 0; y < HEIGHT; y++) { */
+  /*   free(renderer.depth_buffer[y]); */
+	/* } */
+	/* free(renderer.depth_buffer); */
+
 	return 0;
 }

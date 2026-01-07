@@ -19,6 +19,7 @@ sources = [
   'src/loader.c',
   'src/msc.c',
   'src/renderer.c',
+  'src/canvas.c',
 ]
 
 exe = executable(
