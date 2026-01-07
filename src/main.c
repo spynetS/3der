@@ -8,33 +8,26 @@
 #include "renderer.h"
 
 
-#define WIDTH  120
-#define HEIGHT 60
+#define WIDTH  120*2
+#define HEIGHT 60*2
 
 // from loader.c
 int load_obj(float *vertices, unsigned int *indices, int *size, const char* path);
 
 int msleep(long msec);
+int kbhit(void);
 
 void init_cam(Camera *camera){
 	
 	camera->f = 0.75f;
 
-	camera->camera_pos[0] = 5;
-	camera->camera_pos[1] = 5;
+	camera->camera_pos[0] = 0;
+	camera->camera_pos[1] = 0;
 	camera->camera_pos[2] = 0;
 
-	camera->camera_target[0] = 5;
-	camera->camera_target[1] = 5;
-	camera->camera_target[2] = 15;
-
-	/* camera->camera_pos[0] = 0; */
-	/* camera->camera_pos[1] = -100; */
-	/* camera->camera_pos[2] = -50; */
-
-	/* camera->camera_target[0] = 0; */
-	/* camera->camera_target[1] = 0; */
-	/* camera->camera_target[2] = 0; */
+	camera->f = 1/(tan(60*(M_PI/180)));
+	camera->zfar = 100;
+	camera->znear = 0.1f;
 	
 	camera->camera_up[0] = 0;
 	camera->camera_up[1] = 1;
@@ -91,7 +84,7 @@ int main(int args,char **argv) {
 	while(1){
 		setCursorPosition(0, 0);
 		init_renderer(&renderer);
-		printf("\33[0m");
+		printf("\x1b[0m");
 		system("clear");
 		
 		for(int t = 0; t < size; t++) {
@@ -118,8 +111,35 @@ int main(int args,char **argv) {
 
 			render_triangle(&renderer, &triangle);
 		}
-		break;
-		msleep(100);		
+
+		if(kbhit()){
+			switch(getchar()){
+			case 'a':
+				renderer.camera.camera_pos[0] -= 1;
+				break;
+			case 'd':
+				renderer.camera.camera_pos[0] += 1;
+				break;
+			case 'w':
+				renderer.camera.camera_pos[1] += 1;
+				break;
+			case 's':
+				renderer.camera.camera_pos[1] -= 1;
+				break;
+			case '+':
+			case '=':
+				renderer.camera.camera_pos[2] -= 1;
+				break;
+			case '-':
+				renderer.camera.camera_pos[2] += 1;
+				break;
+
+
+
+			}
+		}
+		
+		msleep(16);
 	}
 
 	setCursorPosition(0, HEIGHT);

@@ -10,10 +10,12 @@ typedef struct {
 
 typedef struct {
 	float camera_pos[3];
-	float rot[3];
-	float camera_target[3];
 	float camera_up[3];
+	float rot[3];
 	float f;
+	float zfar;
+	float znear;
+
 } Camera;
 
 
