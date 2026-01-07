@@ -133,9 +133,6 @@ int main(int args,char **argv) {
 			case '-':
 				renderer.camera.camera_pos[2] += 1;
 				break;
-
-
-
 			}
 		}
 		

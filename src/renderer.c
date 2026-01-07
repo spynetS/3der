@@ -98,7 +98,6 @@ void render_triangle(Renderer *renderer, Triangle *triangle) {
 
 	float tri[3][4];
 	
-	
 	to_view(triangle->v0, triangle->v0, &renderer->camera);
 	to_view(triangle->v1, triangle->v1, &renderer->camera);
 	to_view(triangle->v2, triangle->v2, &renderer->camera);
@@ -149,17 +148,6 @@ void render_triangle(Renderer *renderer, Triangle *triangle) {
 				if(z < renderer->depth_buffer[y][x]){
 					renderer->depth_buffer[y][x] = z;
 
-					/* float nx = (triangle->v1[1] - triangle->v0[1])*(triangle->v2[2] - triangle->v0[2]) - (triangle->v1[2] - triangle->v0[2])*(triangle->v2[1] - triangle->v0[1]); */
-					/* float ny = (triangle->v1[2] - triangle->v0[2])*(triangle->v2[0] - triangle->v0[0]) - (triangle->v1[0] - triangle->v0[0])*(triangle->v2[2] - triangle->v0[2]); */
-					/* float nz = (triangle->v1[0] - triangle->v0[0])*(triangle->v2[1] - triangle->v0[1]) - (triangle->v1[1] - triangle->v0[1])*(triangle->v2[0] - triangle->v0[0]); */
-					/* normalize(&nx, &ny, &nz); */
-
-					/* float light_dir[3] = {0, 0, -1}; // light coming from camera */
-					/* float intensity = max(0.0f, nx*light_dir[0] + ny*light_dir[1] + nz*light_dir[2]); */
-					/* int color_val = (int)(intensity * 255); */
-					/* int color[3] = {color_val, 244, color_val}; */
-
-
 					int color[3];
 					color[0] =(int)((1.0f - z) * 255);
 					color[1] = (int)((1.0f - z) * 255);
@@ -170,9 +158,5 @@ void render_triangle(Renderer *renderer, Triangle *triangle) {
 			}
     }
 	}
-
-	/* draw_point(tri[0][0], tri[0][1], renderer->width,renderer->height,"*"); */
-	/* draw_point(tri[1][0], tri[1][1], renderer->width,renderer->height,"*"); */
-	/* draw_point(tri[2][0], tri[2][1], renderer->width,renderer->height,"*"); */
 	
 }
