@@ -14,10 +14,11 @@ dependencies = [
 ]
 
 sources = [
-  'main.c',
-  'vector.c',
-  'loader.c',
-  'renderer.c',
+  'src/main.c',
+  'src/vector.c',
+  'src/loader.c',
+  'src/msc.c',
+  'src/renderer.c',
 ]
 
 exe = executable(
