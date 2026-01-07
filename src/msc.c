@@ -77,3 +77,14 @@ char getKeyPressed(){
     }
     return '[';
 }
+
+struct winsize win;
+
+unsigned int termWidth(){
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &win);
+    return (win.ws_col);
+}
+unsigned int termHeight(){
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &win);
+    return (win.ws_row);
+}

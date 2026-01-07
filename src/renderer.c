@@ -10,29 +10,6 @@ double clamp(double d, double min, double max) {
   return t > max ? max : t;
 }
 
-void draw_point_colored(float x_proj, float y_proj, int width, int height, char* c, int* rgb) {
-	int scale = 1;
-	int x_pixel = x_proj;
-	int y_pixel = y_proj;
-
-
-	if(rgb != NULL){
-		char str[64];
-		if(rgb[0] > 255) rgb[0] = 255;
-		if(rgb[1] > 255) rgb[1] = 255;
-		if(rgb[2] > 255) rgb[2] = 255;
-			
-		sprintf(str,"\33[48;2;%d;%d;%dm%s\33[0m",rgb[0],rgb[1],rgb[2],c);
-		setCharAt(x_pixel, y_pixel, str);
-	} else {
-		setCharAt(x_pixel, y_pixel, c);
-	}
-
-}
-
-void draw_point(float x_proj, float y_proj, int width, int height, const char* c) {
-	draw_point_colored(x_proj, y_proj, width, height, c, NULL);
-}
 
 int is_inside(int px, int py, float tri[3][4])
 {
@@ -149,5 +126,8 @@ void render_triangle(Canvas *canvas, Renderer *renderer, Triangle *triangle) {
 			}
     }
 	}
-	
+
+	set_pixel(canvas, tri[0][0], tri[0][1], 255,255,255);
+	set_pixel(canvas, tri[1][0], tri[1][1], 255,255,255);
+	set_pixel(canvas, tri[2][0], tri[2][1], 255,255,255);
 }

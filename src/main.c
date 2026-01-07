@@ -7,15 +7,10 @@
 //#include "cube.c"
 #include "renderer.h"
 #include "canvas.h"
-
-#define WIDTH  120
-#define HEIGHT 60
+#include "msc.h"
 
 // from loader.c
 int load_obj(float *vertices, unsigned int *indices, int *size, const char* path);
-
-int msleep(long msec);
-int kbhit(void);
 
 void init_cam(Camera *camera){
 	
@@ -34,14 +29,22 @@ void init_cam(Camera *camera){
 	camera->camera_up[2] = 0;
 }
 
-void init_renderer(Renderer *renderer){
+void init_renderer(Renderer *renderer, int width, int height){
 	// initilizes a depth buffer for each pixel
-	renderer->width = WIDTH;
-	renderer->height	= HEIGHT;
-	
-	renderer->depth_buffer = malloc(sizeof(float*) * HEIGHT);
-	for(int y = 0; y < HEIGHT; y++) {
-    renderer->depth_buffer[y] = malloc(sizeof(float) * WIDTH);
+	renderer->width = width;
+	renderer->height	= height;
+	if(renderer->depth_buffer != NULL)
+	{
+		for(int y = 0; y < height; y++) {
+				if(renderer->depth_buffer[y] != NULL)
+					free(renderer->depth_buffer[y]);
+		}
+		free(renderer->depth_buffer);
+	}
+
+	renderer->depth_buffer = malloc(sizeof(float*) * height);
+	for(int y = 0; y < height; y++) {
+    renderer->depth_buffer[y] = malloc(sizeof(float) * width);
 	}
 	for(int y = 0; y < renderer->height; y++) {
 		for(int x = 0; x < renderer->width; x++) {
@@ -52,31 +55,33 @@ void init_renderer(Renderer *renderer){
 
 int main(int args,char **argv) {
 
-
-
-	
 	if(args <= 1) printf("No model provided!\n");
 
+	// load obj
 	float *vertices = malloc(sizeof(float) * 4024*4);
 	unsigned int *indices = malloc(sizeof(unsigned int) * 4024*4);
-
 	int size = 0;
 	load_obj(vertices,indices, &size, argv[1]);
 
-	//	int size = sizeof(indices)/sizeof(indices[0])/3;
-	//	system("clear");
-	//	draw_point(0, 0, WIDTH, HEIGHT, "@");
-
+	int width = termWidth();
+	int height = termHeight();
+	
+	//init renderer
 	Renderer renderer = {0};
-  init_renderer(&renderer);
+  init_renderer(&renderer, width, height);
 	init_cam(&renderer.camera);
 
-	Canvas *canvas = new_canvas(WIDTH, HEIGHT);
-		
-	while(1){
+	Canvas *canvas = new_canvas(width, height);
+	for(int i = 0 ; i < canvas->width * canvas->height; i ++){
+		canvas->buffer2[i].r = 1;
+		canvas->buffer2[i].g = 1;
+		canvas->buffer2[i].b = 1;
+	}
+	render(canvas);
+	int run = 1;
+	while(run){
 		setCursorPosition(0, 0);
-		init_renderer(&renderer);
-		//		system("clear");
+		init_renderer(&renderer, width, height);
 		clear(canvas);
 		
 		for(int t = 0; t < size; t++) {
@@ -125,18 +130,23 @@ int main(int args,char **argv) {
 			case '-':
 				renderer.camera.camera_pos[2] += 1;
 				break;
+			case 'q':
+				run = 0;
+				break;
 			}
 		}
 		render(canvas);
-		msleep(16);
+		//		msleep(16);
 	}
+	free_canvas(canvas);
 
-	//	setCursorPosition(0, HEIGHT);
+	for(int y = 0; y < height; y++) {
+    free(renderer.depth_buffer[y]);
+	}
+	free(renderer.depth_buffer);
 
-	/* for(int y = 0; y < HEIGHT; y++) { */
-  /*   free(renderer.depth_buffer[y]); */
-	/* } */
-	/* free(renderer.depth_buffer); */
-
+	free(vertices);
+	free(indices);
+	
 	return 0;
 }

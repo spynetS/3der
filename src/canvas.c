@@ -15,14 +15,13 @@ void setCharAt(int x, int y, const char *c) {
 	printf("%s",c);
 }
 
-
 Canvas *new_canvas(unsigned int width, unsigned int height) {
     Canvas *canvas = malloc(sizeof(Canvas));
     if (!canvas) return NULL;
 
     canvas->width = width;
     canvas->height = height;
-    canvas->length = (size_t)width * (size_t)height;
+    canvas->length = (int)width * (int)height;
 
     canvas->buffer1 = malloc(sizeof(Pixel) * canvas->length);
     canvas->buffer2 = malloc(sizeof(Pixel) * canvas->length);
@@ -33,7 +32,7 @@ Canvas *new_canvas(unsigned int width, unsigned int height) {
         return NULL;
     }
 
-    for (size_t i = 0; i < canvas->length; i++) {
+    for (int i = 0; i < canvas->length; i++) {
         canvas->buffer1[i] = (Pixel){0,0,0};
         canvas->buffer2[i] = (Pixel){0,0,0};
     }
@@ -41,9 +40,9 @@ Canvas *new_canvas(unsigned int width, unsigned int height) {
     return canvas;
 }
 
-void set_pixel(Canvas* canvas, int x, int y, unsigned char r, unsigned char g, unsigned char b) {
+void set_pixel(Canvas* canvas, unsigned int x, unsigned int y, unsigned char r, unsigned char g, unsigned char b) {
     int index = y * canvas->width + x;
-    if (x < 0 || x >= canvas->width || y < 0 || y >= canvas->height) return; // bounds check
+    if (x >= canvas->width || y >= canvas->height) return; // bounds check
     canvas->buffer2[index].r = r;
     canvas->buffer2[index].g = g;
     canvas->buffer2[index].b = b;
@@ -55,8 +54,8 @@ void print_pixel(Pixel bottom) {
 
 
 void render(Canvas *canvas) {
-	for(int y = 0; y < canvas->height; y ++) {
-		for(int x = 0; x < canvas->width; x ++) {
+	for(unsigned int y = 0; y < canvas->height; y ++) {
+		for(unsigned int x = 0; x < canvas->width; x ++) {
 			int index = y * canvas->width + x;
 			Pixel pixel  = canvas->buffer1[index];
 			Pixel pixel2 = canvas->buffer2[index];
@@ -64,19 +63,21 @@ void render(Canvas *canvas) {
 			if(pixel. r != pixel2.r ||
 				 pixel. g != pixel2.g ||
 				 pixel. b != pixel2.b) {
+#ifdef RENDER				
 				setCursorPosition(x,y);
 				print_pixel(pixel2);
-				/* fflush(stdout); */
-				/* msleep(5); */
+#endif				
 			}
 		}
 	}
+#ifdef RENDER	
 	printf("\x1b[0m\n"); // reset
+#endif	
 	memcpy(canvas->buffer1, canvas->buffer2, sizeof(Pixel) * canvas->width * canvas->height);
 }
 
 void clear(Canvas *canvas){
-	for (size_t i = 0; i < canvas->length; i++) {
+	for (int i = 0; i < canvas->length; i++) {
 		canvas->buffer2[i].r = 0;
 		canvas->buffer2[i].g = 0;
 		canvas->buffer2[i].b = 0;

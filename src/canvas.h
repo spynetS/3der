@@ -1,6 +1,8 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
+#define RENDER
+
 typedef struct {
 	unsigned char r;
 	unsigned char g;
@@ -19,7 +21,7 @@ void setCursorPosition(int x, int y);
 void setCharAt(int x, int y, const char *c);
 
 Canvas *new_canvas(unsigned int width, unsigned int height);
-void set_pixel(Canvas* canvas, int x, int y, unsigned char r, unsigned char g, unsigned char b);
+void set_pixel(Canvas* canvas, unsigned int x, unsigned int y, unsigned char r, unsigned char g, unsigned char b);
 void render(Canvas *canvas);
 void free_canvas(Canvas *canvas);
 void clear(Canvas *canvas);
