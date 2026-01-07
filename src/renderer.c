@@ -22,8 +22,8 @@ void setCharAt(int x, int y, const char *c) {
 
 void draw_point_colored(float x_proj, float y_proj, int width, int height, char* c, int* rgb) {
 	int scale = 1;
-	int x_pixel = x_proj;//+width/2;//(int)((x_proj + 1.0f) * 0.5f * (width - 1));
-	int y_pixel = y_proj;//+height/2;//(int)((1.0f - (y_proj + 1.0f) * 0.5f) * (height - 1)); // flip Y
+	int x_pixel = x_proj;
+	int y_pixel = y_proj;
 
 
 	if(rgb != NULL){
@@ -73,13 +73,21 @@ float pixel_depth(float x, float y, float tri[3][4]) {
 	return z;
 }
 
-int to_screen_x(float x, int width) {
-	return (int)((x + 1.0f) * 0.5f * (width - 1));
+void to_screen(float x[4], int width, int height) {
+	x[0] = (int)((x[0] + 1.0f) * 0.5f * (width - 1));
+	x[1] = (int)((1.0f -(x[1] + 1.0f) * 0.5f) * (height - 1));
 }
 
-int to_screen_y(float y, int height) {
+void normalize(float *x, float *y, float *z) {
+    float length = sqrt((*x)*(*x) + (*y)*(*y) + (*z)*(*z));
+    if(length == 0) return; // avoid division by zero
+    *x /= length;
+    *y /= length;
+    *z /= length;
+}
 
-	return (int)((1.0f -(y + 1.0f) * 0.5f) * (height - 1)); // flip Y
+double max (double a, double b) {
+	return a > b ? a : b;
 }
 
 void render_triangle(Renderer *renderer, Triangle *triangle) {
@@ -113,15 +121,9 @@ void render_triangle(Renderer *renderer, Triangle *triangle) {
 
 	}
 	
-	
-	tri[0][0] = to_screen_x(tri[0][0], renderer->width);
-	tri[0][1] = to_screen_y(tri[0][1], renderer->height);
-
-	tri[1][0] = to_screen_x(tri[1][0], renderer->width);
-	tri[1][1] = to_screen_y(tri[1][1], renderer->height);
-
-	tri[2][0] = to_screen_x(tri[2][0], renderer->width);
-	tri[2][1] = to_screen_y(tri[2][1], renderer->height);
+	to_screen(tri[0],renderer->width, renderer->height);
+	to_screen(tri[1],renderer->width, renderer->height);
+	to_screen(tri[2],renderer->width, renderer->height);
 
 	int minX = floor(fminf(fminf(tri[0][0], tri[1][0]), tri[2][0]));
 	int maxX = ceil(fmaxf(fmaxf(tri[0][0], tri[1][0]), tri[2][0]));
@@ -134,28 +136,29 @@ void render_triangle(Renderer *renderer, Triangle *triangle) {
 	maxY = fminf(maxY, renderer->height - 1);
 
 	
-for(int y = minY; y <= maxY; y++){
+	for(int y = minY; y <= maxY; y++){
     for(int x = minX; x <= maxX; x++){
-        if(is_inside(x, y, tri)){
-					float z = pixel_depth(x, y, tri);
-            if(z < renderer->depth_buffer[y][x]){
-							renderer->depth_buffer[y][x] = z;
-							/* int r = (int)((1.0f - z) * 255); */
-							/* int g = (int)((1.0f - z) * 255); */
-							/* int b = (int)((1.0f - z) * 255); */
+			if(is_inside(x, y, tri)){
+				float z = pixel_depth(x, y, tri);
+				if(z < renderer->depth_buffer[y][x]){
+					renderer->depth_buffer[y][x] = z;
 
-							int r = (int)(z * 255);       // far = red
-							int g = 0;
-							int b = (int)((1.0f - z) * 255); // near = blue
+					float nx = (triangle->v1[1] - triangle->v0[1])*(triangle->v2[2] - triangle->v0[2]) - (triangle->v1[2] - triangle->v0[2])*(triangle->v2[1] - triangle->v0[1]);
+					float ny = (triangle->v1[2] - triangle->v0[2])*(triangle->v2[0] - triangle->v0[0]) - (triangle->v1[0] - triangle->v0[0])*(triangle->v2[2] - triangle->v0[2]);
+					float nz = (triangle->v1[0] - triangle->v0[0])*(triangle->v2[1] - triangle->v0[1]) - (triangle->v1[1] - triangle->v0[1])*(triangle->v2[0] - triangle->v0[0]);
+					normalize(&nx, &ny, &nz);
 
-
-							int color[3] = {r ,g ,b};
-							draw_point_colored(x, y, renderer->width, renderer->height, " ", color);
-            }
-        }
+					float light_dir[3] = {0, 0, -1}; // light coming from camera
+					float intensity = max(0.0f, nx*light_dir[0] + ny*light_dir[1] + nz*light_dir[2]);
+					int color_val = (int)(intensity * 255);
+					int color[3] = {color_val, color_val, color_val};
+					
+					
+					draw_point_colored(x, y, renderer->width, renderer->height, " ", color);
+				}
+			}
     }
-}
-
+	}
 
 	/* draw_point(tri[0][0], tri[0][1], renderer->width,renderer->height,"*"); */
 	/* draw_point(tri[1][0], tri[1][1], renderer->width,renderer->height,"*"); */
