@@ -1,18 +1,19 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 #include "canvas.h"
+#include "vector.h"
 
 typedef struct {
-	float v0[3];
-	float v1[3];
-	float v2[3];
+	Vec3 v0;
+	Vec3 v1;
+	Vec3 v2;
 	float *indices;
 } Triangle;
 
 typedef struct {
-	float camera_pos[3];
-	float camera_up[3];
-	float rot[3];
+	Vec3 camera_pos;
+	Vec3 camera_up;
+	Vec3 rot;
 	float f;
 	float zfar;
 	float znear;

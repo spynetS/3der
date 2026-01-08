@@ -14,22 +14,22 @@ int load_obj(float *vertices, unsigned int *indices, int *size, const char* path
 
 void init_cam(Camera *camera){
 	
-	camera->camera_pos[0] = 0;
-	camera->camera_pos[1] = 0;
-	camera->camera_pos[2] = 0;
+	camera->camera_pos.x = 0;
+	camera->camera_pos.y = 0;
+	camera->camera_pos.z = 0;
 
-	camera->rot[0] = 0;
-	camera->rot[1] = 0;
-	camera->rot[2] = 0;
+	camera->rot.x = 0;
+	camera->rot.y = 0;
+	camera->rot.z = 0;
 
 	set_fov(camera, 60);
 	
 	camera->zfar = 100;
 	camera->znear = 0.1f;
 	
-	camera->camera_up[0] = 0;
-	camera->camera_up[1] = 1;
-	camera->camera_up[2] = 0;
+	camera->camera_up.data[0] = 0;
+	camera->camera_up.data[1] = 1;
+	camera->camera_up.data[2] = 0;
 }
 
 void init_renderer(Renderer *renderer, int width, int height){
@@ -106,19 +106,19 @@ int main(int args,char **argv) {
 			unsigned int i2 = indices[t*3 + 2];
 
 			// Vertex 0
-			triangle.v0[0] = vertices[i0*3 + 0];
-			triangle.v0[1] = vertices[i0*3 + 1];
-			triangle.v0[2] = vertices[i0*3 + 2];
+			triangle.v0.data[0] = vertices[i0*3 + 0];
+			triangle.v0.data[1] = vertices[i0*3 + 1];
+			triangle.v0.data[2] = vertices[i0*3 + 2];
 
 			// Vertex 1
-			triangle.v1[0] = vertices[i1*3 + 0];
-			triangle.v1[1] = vertices[i1*3 + 1];
-			triangle.v1[2] = vertices[i1*3 + 2];
+			triangle.v1.data[0] = vertices[i1*3 + 0];
+			triangle.v1.data[1] = vertices[i1*3 + 1];
+			triangle.v1.data[2] = vertices[i1*3 + 2];
 
 			// Vertex 2
-			triangle.v2[0] = vertices[i2*3 + 0];
-			triangle.v2[1] = vertices[i2*3 + 1];
-			triangle.v2[2] = vertices[i2*3 + 2];
+			triangle.v2.data[0] = vertices[i2*3 + 0];
+			triangle.v2.data[1] = vertices[i2*3 + 1];
+			triangle.v2.data[2] = vertices[i2*3 + 2];
 
 			render_triangle(canvas, &renderer, &triangle);
 		}
@@ -147,23 +147,23 @@ void check_input(Renderer *renderer, float *deg, int *run)
 	if(kbhit()){
 			switch(getchar()){
 			case 'a':
-				renderer->camera.camera_pos[0] -= 1;
+				renderer->camera.camera_pos.data[0] -= 1;
 				break;
 			case 'd':
-				renderer->camera.camera_pos[0] += 1;
+				renderer->camera.camera_pos.data[0] += 1;
 				break;
 			case 'w':
-				renderer->camera.camera_pos[1] += 1;
+				renderer->camera.camera_pos.data[1] += 1;
 				break;
 			case 's':
-				renderer->camera.camera_pos[1] -= 1;
+				renderer->camera.camera_pos.data[1] -= 1;
 				break;
 			case '+':
 			case '=':
-				renderer->camera.camera_pos[2] -= 1;
+				renderer->camera.camera_pos.data[2] -= 1;
 				break;
 			case '-':
-				renderer->camera.camera_pos[2] += 1;
+				renderer->camera.camera_pos.data[2] += 1;
 				break;
 			case 'f':
 				(*deg) += 1;
@@ -174,16 +174,16 @@ void check_input(Renderer *renderer, float *deg, int *run)
 				set_fov(&renderer->camera, (*deg));
 				break;
 			case '8':
-				renderer->camera.rot[0] += 1;
+				renderer->camera.rot.data[0] += 1;
 				break;
 			case '2':
-				renderer->camera.rot[0] -= 1;
+				renderer->camera.rot.data[0] -= 1;
 				break;
 			case '4':
-				renderer->camera.rot[1] += 1;
+				renderer->camera.rot.data[1] += 1;
 				break;
 			case '6':
-				renderer->camera.rot[1] -= 1;
+				renderer->camera.rot.data[1] -= 1;
 				break;
 			case 'q':
 				(*run) = 0;

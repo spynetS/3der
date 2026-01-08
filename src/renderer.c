@@ -63,9 +63,9 @@ double max (double a, double b) {
 }
 
 void to_view(Triangle *triangle, Camera *camera) {
-	vector_subtract(triangle->v0, triangle->v0,camera->camera_pos,3);
-	vector_subtract(triangle->v1, triangle->v1,camera->camera_pos,3);
-	vector_subtract(triangle->v2, triangle->v2,camera->camera_pos,3);
+	vector_subtract(&triangle->v0, &triangle->v0,&camera->camera_pos);
+	vector_subtract(&triangle->v1, &triangle->v1,&camera->camera_pos);
+	vector_subtract(&triangle->v2, &triangle->v2,&camera->camera_pos);
 }
 
 void render_triangle(Canvas *canvas, Renderer *renderer, Triangle *triangle) {
@@ -82,9 +82,9 @@ void render_triangle(Canvas *canvas, Renderer *renderer, Triangle *triangle) {
 	};
 
 	// apply the matrix on the vertexes
-	vector_4x4_4(tri[0], p, triangle->v0);
-	vector_4x4_4(tri[1], p, triangle->v1);
-	vector_4x4_4(tri[2], p, triangle->v2);
+	vector_4x4_4(tri[0], p, triangle->v0.data);
+	vector_4x4_4(tri[1], p, triangle->v1.data);
+	vector_4x4_4(tri[2], p, triangle->v2.data);
 
 	// divide by w
 	for(int i=0; i<3; i++) {
