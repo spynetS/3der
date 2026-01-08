@@ -71,3 +71,8 @@ void vector_4x4_4(float *c, float matrix[4][4], float u[4]) {
 	c[2] = vector_dot(matrix[2], u, 4);
 	c[3] = vector_dot(matrix[3], u, 4);
 }
+
+void vector_lookAt(float result[4][4], float eye[3], float target[3], float up[3]) {
+
+	
+}

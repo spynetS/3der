@@ -88,3 +88,11 @@ unsigned int termHeight(){
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &win);
     return (win.ws_row);
 }
+
+
+void hideCursor() {
+	printf("\e[?25l");
+}
+void showCursor() {
+	printf("\e[?25h");
+}

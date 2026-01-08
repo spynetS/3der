@@ -16,7 +16,6 @@ typedef struct {
 	float f;
 	float zfar;
 	float znear;
-
 } Camera;
 
 
@@ -26,6 +25,9 @@ typedef struct {
 	int height;
 	Camera camera;
 } Renderer;
+
+void set_fov(Camera* camera, float deg);
+
 
 void render_triangle(Canvas *canvas, Renderer *renderer, Triangle *triangle);
 	

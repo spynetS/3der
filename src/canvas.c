@@ -1,10 +1,11 @@
 #include "canvas.h"
+#include "msc.h"
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 
-int msleep(long msec);
+
 
 void setCursorPosition(int x, int y) {
 	printf("\033[%d;%dH", y+1, x+1);
@@ -16,6 +17,10 @@ void setCharAt(int x, int y, const char *c) {
 }
 
 Canvas *new_canvas(unsigned int width, unsigned int height) {
+
+  	disableEcho();
+  	hideCursor();
+	
     Canvas *canvas = malloc(sizeof(Canvas));
     if (!canvas) return NULL;
 
@@ -74,6 +79,7 @@ void render(Canvas *canvas) {
 	printf("\x1b[0m\n"); // reset
 #endif	
 	memcpy(canvas->buffer1, canvas->buffer2, sizeof(Pixel) * canvas->width * canvas->height);
+	fflush(stdout);
 }
 
 void clear(Canvas *canvas){

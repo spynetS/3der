@@ -18,6 +18,10 @@ void disableEcho();
 // Function to enable terminal echoing
 void enableEcho();
 
+void hideCursor();
+void showCursor();
+
+
 int kbhit(void);
 unsigned int termWidth();
 unsigned int termHeight();

@@ -14,13 +14,16 @@ int load_obj(float *vertices, unsigned int *indices, int *size, const char* path
 
 void init_cam(Camera *camera){
 	
-	camera->f = 0.75f;
-
 	camera->camera_pos[0] = 0;
 	camera->camera_pos[1] = 0;
 	camera->camera_pos[2] = 0;
 
-	camera->f = 1/(tan(60*(M_PI/180)));
+	camera->rot[0] = 0;
+	camera->rot[1] = 0;
+	camera->rot[2] = 0;
+
+	set_fov(camera, 60);
+	
 	camera->zfar = 100;
 	camera->znear = 0.1f;
 	
@@ -78,11 +81,15 @@ int main(int args,char **argv) {
 		canvas->buffer2[i].b = 1;
 	}
 	render(canvas);
+
+	float deg = 60;
+	
 	int run = 1;
 	while(run){
 		setCursorPosition(0, 0);
 		init_renderer(&renderer, width, height);
 		clear(canvas);
+		//		system("clear");
 		
 		for(int t = 0; t < size; t++) {
 			Triangle triangle = {0};
@@ -130,13 +137,34 @@ int main(int args,char **argv) {
 			case '-':
 				renderer.camera.camera_pos[2] += 1;
 				break;
+			case 'f':
+				deg += 1;
+				set_fov(&renderer.camera, deg);
+				break;
+			case 'F':
+				deg -= 1;
+				set_fov(&renderer.camera, deg);
+				break;
+			case '8':
+				renderer.camera.rot[0] += 1;
+				break;
+			case '2':
+				renderer.camera.rot[0] -= 1;
+				break;
+			case '4':
+				renderer.camera.rot[1] += 1;
+				break;
+			case '6':
+				renderer.camera.rot[1] -= 1;
+				break;
 			case 'q':
 				run = 0;
 				break;
 			}
 		}
+
 		render(canvas);
-		//		msleep(16);
+		msleep(16);
 	}
 	free_canvas(canvas);
 

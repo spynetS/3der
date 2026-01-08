@@ -11,5 +11,6 @@ void vector_subtract(float *c, float *a, float *b, int size);
 void vector_cross(float *c, float *a, float *b, int size);
 void vector_normalize(float *c, float *a, int size);
 void vector_4x4_4(float *c, float matrix[4][4], float u[3]);
-	
+void vector_lookAt(float result[4][4], float eye[3], float target[3], float up[3]);
+
 #endif

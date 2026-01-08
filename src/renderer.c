@@ -5,6 +5,11 @@
 #include "renderer.h"
 #include "vector.h"
 
+void set_fov(Camera* camera, float deg) {
+	camera->f = 1/(tan(deg*(M_PI/180)));
+}
+
+
 double clamp(double d, double min, double max) {
   const double t = d < min ? min : d;
   return t > max ? max : t;
@@ -57,30 +62,31 @@ double max (double a, double b) {
 	return a > b ? a : b;
 }
 
-void to_view(float *c, float *v, Camera *camera) {
-	vector_subtract(c, v, camera->camera_pos,3);
+void to_view(Triangle *triangle, Camera *camera) {
+	vector_subtract(triangle->v0, triangle->v0,camera->camera_pos,3);
+	vector_subtract(triangle->v1, triangle->v1,camera->camera_pos,3);
+	vector_subtract(triangle->v2, triangle->v2,camera->camera_pos,3);
 }
 
 void render_triangle(Canvas *canvas, Renderer *renderer, Triangle *triangle) {
 
 	float tri[3][4];
+	to_view(triangle, &renderer->camera);
 	
-	to_view(triangle->v0, triangle->v0, &renderer->camera);
-	to_view(triangle->v1, triangle->v1, &renderer->camera);
-	to_view(triangle->v2, triangle->v2, &renderer->camera);
-	
-	
+	// perspective matrix
 	float p[4][4] = {
 		{renderer->camera.f/(renderer->width/renderer->height), 0, 0,0},
 		{0, renderer->camera.f, 0,0},
 		{0, (renderer->camera.zfar+renderer->camera.znear)/(renderer->camera.znear-renderer->camera.zfar), (2*renderer->camera.zfar*renderer->camera.znear)/(renderer->camera.znear-renderer->camera.zfar),0},
 		{0, 0,-1,0},
 	};
-	
+
+	// apply the matrix on the vertexes
 	vector_4x4_4(tri[0], p, triangle->v0);
 	vector_4x4_4(tri[1], p, triangle->v1);
 	vector_4x4_4(tri[2], p, triangle->v2);
 
+	// divide by w
 	for(int i=0; i<3; i++) {
     tri[i][0] /= tri[i][3];
     tri[i][1] /= tri[i][3];
@@ -90,9 +96,9 @@ void render_triangle(Canvas *canvas, Renderer *renderer, Triangle *triangle) {
 		float z_ndc = tri[i][2]; // after perspective divide
 		float z_screen = (z_ndc + 1.0f) * 0.5f; // now in [0,1]
 		tri[i][2] = z_screen;
-
 	}
-	
+
+	// convert to screen cordinates
 	to_screen(tri[0],renderer->width, renderer->height);
 	to_screen(tri[1],renderer->width, renderer->height);
 	to_screen(tri[2],renderer->width, renderer->height);
@@ -102,6 +108,7 @@ void render_triangle(Canvas *canvas, Renderer *renderer, Triangle *triangle) {
 	int minY = floor(fminf(fminf(tri[0][1], tri[1][1]), tri[2][1]));
 	int maxY = ceil(fmaxf(fmaxf(tri[0][1], tri[1][1]), tri[2][1]));
 
+	// bounding box
 	minX = fmaxf(minX, 0);
 	maxX = fminf(maxX, renderer->width - 1);
 	minY = fmaxf(minY, 0);
@@ -127,7 +134,7 @@ void render_triangle(Canvas *canvas, Renderer *renderer, Triangle *triangle) {
     }
 	}
 
-	set_pixel(canvas, tri[0][0], tri[0][1], 255,255,255);
-	set_pixel(canvas, tri[1][0], tri[1][1], 255,255,255);
-	set_pixel(canvas, tri[2][0], tri[2][1], 255,255,255);
+	/* set_pixel(canvas, tri[0][0], tri[0][1], 255,255,255); */
+	/* set_pixel(canvas, tri[1][0], tri[1][1], 255,255,255); */
+	/* set_pixel(canvas, tri[2][0], tri[2][1], 255,255,255); */
 }
