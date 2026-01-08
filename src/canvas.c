@@ -18,31 +18,32 @@ void setCharAt(int x, int y, const char *c) {
 
 Canvas *new_canvas(unsigned int width, unsigned int height) {
 
-  	disableEcho();
-  	hideCursor();
+	disableEcho();
+	hideCursor();
 	
-    Canvas *canvas = malloc(sizeof(Canvas));
-    if (!canvas) return NULL;
+	Canvas *canvas = malloc(sizeof(Canvas));
+	if (!canvas) return NULL;
 
-    canvas->width = width;
-    canvas->height = height;
-    canvas->length = (int)width * (int)height;
+	canvas->force_rerender = 0;
+	canvas->width = width;
+	canvas->height = height;
+	canvas->length = (int)width * (int)height;
 
-    canvas->buffer1 = malloc(sizeof(Pixel) * canvas->length);
-    canvas->buffer2 = malloc(sizeof(Pixel) * canvas->length);
-    if (!canvas->buffer1 || !canvas->buffer2) {
-        free(canvas->buffer1);
-        free(canvas->buffer2);
-        free(canvas);
-        return NULL;
-    }
+	canvas->buffer1 = malloc(sizeof(Pixel) * canvas->length);
+	canvas->buffer2 = malloc(sizeof(Pixel) * canvas->length);
+	if (!canvas->buffer1 || !canvas->buffer2) {
+		free(canvas->buffer1);
+		free(canvas->buffer2);
+		free(canvas);
+		return NULL;
+	}
 
-    for (int i = 0; i < canvas->length; i++) {
-        canvas->buffer1[i] = (Pixel){0,0,0};
-        canvas->buffer2[i] = (Pixel){0,0,0};
-    }
+	for (int i = 0; i < canvas->length; i++) {
+		canvas->buffer1[i] = (Pixel){0,0,0};
+		canvas->buffer2[i] = (Pixel){0,0,0};
+	}
 
-    return canvas;
+	return canvas;
 }
 
 void set_pixel(Canvas* canvas, unsigned int x, unsigned int y, unsigned char r, unsigned char g, unsigned char b) {
@@ -65,7 +66,8 @@ void render(Canvas *canvas) {
 			Pixel pixel  = canvas->buffer1[index];
 			Pixel pixel2 = canvas->buffer2[index];
 
-			if(pixel. r != pixel2.r ||
+			if(canvas->force_rerender || 
+				 pixel. r != pixel2.r ||
 				 pixel. g != pixel2.g ||
 				 pixel. b != pixel2.b) {
 #ifdef RENDER				

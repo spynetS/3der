@@ -56,6 +56,8 @@ void init_renderer(Renderer *renderer, int width, int height){
 	}
 }
 
+void check_input(Renderer *renderer, float *deg, int *run);
+
 int main(int args,char **argv) {
 
 	if(args <= 1) printf("No model provided!\n");
@@ -76,12 +78,14 @@ int main(int args,char **argv) {
 
 	Canvas *canvas = new_canvas(width, height);
 	for(int i = 0 ; i < canvas->width * canvas->height; i ++){
-		canvas->buffer2[i].r = 1;
-		canvas->buffer2[i].g = 1;
-		canvas->buffer2[i].b = 1;
+		canvas->buffer2[i].r = 0;
+		canvas->buffer2[i].g = 0;
+		canvas->buffer2[i].b = 0;
 	}
+	canvas->force_rerender = 1;
 	render(canvas);
-
+	canvas->force_rerender = 0;
+	
 	float deg = 60;
 	
 	int run = 1;
@@ -90,6 +94,8 @@ int main(int args,char **argv) {
 		init_renderer(&renderer, width, height);
 		clear(canvas);
 		//		system("clear");
+
+		check_input(&renderer, &deg, &run);
 		
 		for(int t = 0; t < size; t++) {
 			Triangle triangle = {0};
@@ -116,53 +122,6 @@ int main(int args,char **argv) {
 			render_triangle(canvas, &renderer, &triangle);
 		}
 
-		if(kbhit()){
-			switch(getchar()){
-			case 'a':
-				renderer.camera.camera_pos[0] -= 1;
-				break;
-			case 'd':
-				renderer.camera.camera_pos[0] += 1;
-				break;
-			case 'w':
-				renderer.camera.camera_pos[1] += 1;
-				break;
-			case 's':
-				renderer.camera.camera_pos[1] -= 1;
-				break;
-			case '+':
-			case '=':
-				renderer.camera.camera_pos[2] -= 1;
-				break;
-			case '-':
-				renderer.camera.camera_pos[2] += 1;
-				break;
-			case 'f':
-				deg += 1;
-				set_fov(&renderer.camera, deg);
-				break;
-			case 'F':
-				deg -= 1;
-				set_fov(&renderer.camera, deg);
-				break;
-			case '8':
-				renderer.camera.rot[0] += 1;
-				break;
-			case '2':
-				renderer.camera.rot[0] -= 1;
-				break;
-			case '4':
-				renderer.camera.rot[1] += 1;
-				break;
-			case '6':
-				renderer.camera.rot[1] -= 1;
-				break;
-			case 'q':
-				run = 0;
-				break;
-			}
-		}
-
 		render(canvas);
 		msleep(16);
 	}
@@ -177,4 +136,55 @@ int main(int args,char **argv) {
 	free(indices);
 	
 	return 0;
+}
+
+
+void check_input(Renderer *renderer, float *deg, int *run)
+{
+	if(kbhit()){
+			switch(getchar()){
+			case 'a':
+				renderer->camera.camera_pos[0] -= 1;
+				break;
+			case 'd':
+				renderer->camera.camera_pos[0] += 1;
+				break;
+			case 'w':
+				renderer->camera.camera_pos[1] += 1;
+				break;
+			case 's':
+				renderer->camera.camera_pos[1] -= 1;
+				break;
+			case '+':
+			case '=':
+				renderer->camera.camera_pos[2] -= 1;
+				break;
+			case '-':
+				renderer->camera.camera_pos[2] += 1;
+				break;
+			case 'f':
+				(*deg) += 1;
+				set_fov(&renderer->camera, (*deg));
+				break;
+			case 'F':
+				(*deg) -= 1;
+				set_fov(&renderer->camera, (*deg));
+				break;
+			case '8':
+				renderer->camera.rot[0] += 1;
+				break;
+			case '2':
+				renderer->camera.rot[0] -= 1;
+				break;
+			case '4':
+				renderer->camera.rot[1] += 1;
+				break;
+			case '6':
+				renderer->camera.rot[1] -= 1;
+				break;
+			case 'q':
+				(*run) = 0;
+				break;
+			}
+		}
 }

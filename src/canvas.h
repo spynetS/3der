@@ -15,6 +15,7 @@ typedef struct {
 	int length;
 	unsigned int width;
 	unsigned int height;
+	int force_rerender;
 } Canvas;
 
 void setCursorPosition(int x, int y);
