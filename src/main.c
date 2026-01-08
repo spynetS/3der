@@ -76,6 +76,7 @@ int main(int args,char **argv) {
   init_renderer(&renderer, width, height);
 	init_cam(&renderer.camera);
 
+	// init canvas
 	Canvas *canvas = new_canvas(width, height);
 	for(int i = 0 ; i < canvas->width * canvas->height; i ++){
 		canvas->buffer2[i].r = 0;
@@ -87,8 +88,8 @@ int main(int args,char **argv) {
 	canvas->force_rerender = 0;
 	
 	float deg = 60;
-	
 	int run = 1;
+	
 	while(run){
 		setCursorPosition(0, 0);
 		init_renderer(&renderer, width, height);
@@ -125,6 +126,8 @@ int main(int args,char **argv) {
 		render(canvas);
 		msleep(16);
 	}
+
+	// FREE A BUNCH
 	free_canvas(canvas);
 
 	for(int y = 0; y < height; y++) {
