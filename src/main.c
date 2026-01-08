@@ -27,9 +27,9 @@ void init_cam(Camera *camera){
 	camera->zfar = 100;
 	camera->znear = 0.1f;
 	
-	camera->camera_up.data[0] = 0;
-	camera->camera_up.data[1] = 1;
-	camera->camera_up.data[2] = 0;
+	camera->camera_up.x = 0;
+	camera->camera_up.y = 1;
+	camera->camera_up.z = 0;
 }
 
 void init_renderer(Renderer *renderer, int width, int height){
@@ -106,19 +106,19 @@ int main(int args,char **argv) {
 			unsigned int i2 = indices[t*3 + 2];
 
 			// Vertex 0
-			triangle.v0.data[0] = vertices[i0*3 + 0];
-			triangle.v0.data[1] = vertices[i0*3 + 1];
-			triangle.v0.data[2] = vertices[i0*3 + 2];
+			triangle.v0.x = vertices[i0*3 + 0];
+			triangle.v0.y = vertices[i0*3 + 1];
+			triangle.v0.z = vertices[i0*3 + 2];
 
 			// Vertex 1
-			triangle.v1.data[0] = vertices[i1*3 + 0];
-			triangle.v1.data[1] = vertices[i1*3 + 1];
-			triangle.v1.data[2] = vertices[i1*3 + 2];
+			triangle.v1.x = vertices[i1*3 + 0];
+			triangle.v1.y = vertices[i1*3 + 1];
+			triangle.v1.z = vertices[i1*3 + 2];
 
 			// Vertex 2
-			triangle.v2.data[0] = vertices[i2*3 + 0];
-			triangle.v2.data[1] = vertices[i2*3 + 1];
-			triangle.v2.data[2] = vertices[i2*3 + 2];
+			triangle.v2.x = vertices[i2*3 + 0];
+			triangle.v2.y = vertices[i2*3 + 1];
+			triangle.v2.z = vertices[i2*3 + 2];
 
 			render_triangle(canvas, &renderer, &triangle);
 		}
