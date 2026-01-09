@@ -85,10 +85,10 @@ int main(int args,char **argv) {
 
 	object.transform.pos.x = 0;
 	object.transform.pos.y = 0;
-	object.transform.pos.z = 0;
+	object.transform.pos.z = -2;
 
 	
-	object.transform.rot.x = 0;//(M_PI/180);
+	object.transform.rot.x = 90*(M_PI/180);//(M_PI/180);
 	object.transform.rot.y = 0;
 	object.transform.rot.z = 0;
 
@@ -127,7 +127,8 @@ int main(int args,char **argv) {
 			render_triangle(canvas, &renderer, triangle);
 		}
 
-		object.transform.rot.x += 0.05f;
+		//		object.transform.rot.x += 0.02f;
+		object.transform.rot.y += 0.05f;
 		
 		render(canvas);
 		msleep(16);
