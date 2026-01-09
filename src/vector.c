@@ -78,7 +78,7 @@ void vector_normalize(Vec3 *c, Vec3 *a) {
 }
 
 
-void vector_4x4_4(float *c, float matrix[4][4], float u[4]) {
+void vector_4x4_4(float c[4], float matrix[4][4], float u[4]) {
 	c[0] = vector4_dot(matrix[0], u, 4);
 	c[1] = vector4_dot(matrix[1], u, 4);
 	c[2] = vector4_dot(matrix[2], u, 4);

@@ -63,15 +63,76 @@ double max (double a, double b) {
 }
 
 void to_view(Triangle *triangle, Camera *camera) {
-	vector_subtract(&triangle->v0, &triangle->v0,&camera->camera_pos);
-	vector_subtract(&triangle->v1, &triangle->v1,&camera->camera_pos);
-	vector_subtract(&triangle->v2, &triangle->v2,&camera->camera_pos);
+	vector_subtract(&triangle->v0, &triangle->v0,&camera->pos);
+	vector_subtract(&triangle->v1, &triangle->v1,&camera->pos);
+	vector_subtract(&triangle->v2, &triangle->v2,&camera->pos);
 }
 
-void render_triangle(Canvas *canvas, Renderer *renderer, Triangle *triangle) {
+void mat4_identity(float m[4][4]) {
+    for (int i=0;i<4;i++)
+        for (int j=0;j<4;j++)
+            m[i][j] = (i==j) ? 1.0f : 0.0f;
+}
+
+void mat4_mul(float out[4][4], float a[4][4], float b[4][4]) {
+    float tmp[4][4];
+    for(int i=0;i<4;i++)
+        for(int j=0;j<4;j++) {
+            tmp[i][j] = 0;
+            for(int k=0;k<4;k++)
+                tmp[i][j] += a[i][k] * b[k][j];
+        }
+    // copy tmp to out
+    for(int i=0;i<4;i++)
+        for(int j=0;j<4;j++)
+            out[i][j] = tmp[i][j];
+}
+
+void transform_matrix(float matrix[4][4], Transform t) {
+    float sx = t.scale.x, sy = t.scale.y, sz = t.scale.z;
+    float cx = cosf(t.rot.x), sxr = sinf(t.rot.x);
+    float cy = cosf(t.rot.y), syr = sinf(t.rot.y);
+    float cz = cosf(t.rot.z), szr = sinf(t.rot.z);
+
+    // Scale matrix
+    float S[4][4]; mat4_identity(S);
+    S[0][0] = sx; S[1][1] = sy; S[2][2] = sz;
+
+    // Rotation X
+    float Rx[4][4]; mat4_identity(Rx);
+    Rx[1][1] = cx; Rx[1][2] = -sxr;
+    Rx[2][1] = sxr; Rx[2][2] = cx;
+
+    // Rotation Y
+    float Ry[4][4]; mat4_identity(Ry);
+    Ry[0][0] = cy; Ry[0][2] = syr;
+    Ry[2][0] = -syr; Ry[2][2] = cy;
+
+    // Rotation Z
+    float Rz[4][4]; mat4_identity(Rz);
+    Rz[0][0] = cz; Rz[0][1] = -szr;
+    Rz[1][0] = szr; Rz[1][1] = cz;
+
+    // Combine rotations R = Rz * Ry * Rx
+    float R[4][4]; mat4_identity(R);
+    mat4_mul(R, Rz, Ry);
+    mat4_mul(R, R, Rx);
+
+    // Apply scale: R = R * S
+    mat4_mul(R, R, S);
+
+    // Translation matrix
+    float T[4][4]; mat4_identity(T);
+    T[0][3] = t.pos.x; T[1][3] = t.pos.y; T[2][3] = t.pos.z;
+
+    // Final matrix M = T * R * S
+    mat4_mul(matrix, T, R);
+}
+
+void render_triangle(Canvas *canvas, Renderer *renderer, Triangle triangle) {
 
 	float tri[3][4];
-	to_view(triangle, &renderer->camera);
+	to_view(&triangle, &renderer->camera);
 	
 	// perspective matrix
 	float p[4][4] = {
@@ -82,9 +143,9 @@ void render_triangle(Canvas *canvas, Renderer *renderer, Triangle *triangle) {
 	};
 
 	// apply the matrix on the vertexes
-	vector_4x4_4(tri[0], p, triangle->v0.data);
-	vector_4x4_4(tri[1], p, triangle->v1.data);
-	vector_4x4_4(tri[2], p, triangle->v2.data);
+	vector_4x4_4(tri[0], p, triangle.v0.data);
+	vector_4x4_4(tri[1], p, triangle.v1.data);
+	vector_4x4_4(tri[2], p, triangle.v2.data);
 
 	// divide by w
 	for(int i=0; i<3; i++) {

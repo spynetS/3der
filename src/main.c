@@ -8,15 +8,14 @@
 #include "renderer.h"
 #include "canvas.h"
 #include "msc.h"
+#include "loader.h"
 
-// from loader.c
-int load_obj(float *vertices, unsigned int *indices, int *size, const char* path);
 
 void init_cam(Camera *camera){
 	
-	camera->camera_pos.x = 0;
-	camera->camera_pos.y = 0;
-	camera->camera_pos.z = 0;
+	camera->pos.x = 0;
+	camera->pos.y = 0;
+	camera->pos.z = 0;
 
 	camera->rot.x = 0;
 	camera->rot.y = 0;
@@ -63,10 +62,6 @@ int main(int args,char **argv) {
 	if(args <= 1) printf("No model provided!\n");
 
 	// load obj
-	float *vertices = malloc(sizeof(float) * 4024*4);
-	unsigned int *indices = malloc(sizeof(unsigned int) * 4024*4);
-	int size = 0;
-	load_obj(vertices,indices, &size, argv[1]);
 
 	int width = termWidth();
 	int height = termHeight();
@@ -78,51 +73,59 @@ int main(int args,char **argv) {
 
 	// init canvas
 	Canvas *canvas = new_canvas(width, height);
-	for(int i = 0 ; i < canvas->width * canvas->height; i ++){
-		canvas->buffer2[i].r = 0;
-		canvas->buffer2[i].g = 0;
-		canvas->buffer2[i].b = 0;
-	}
+	canvas->bg = (Pixel){0,0,100};
 	canvas->force_rerender = 1;
 	render(canvas);
 	canvas->force_rerender = 0;
 	
 	float deg = 60;
 	int run = 1;
+	Object object = {0};
+	load_object(&object, argv[1]);
+
+	object.transform.pos.x = 100;
+	object.transform.pos.y = 0;
+	object.transform.pos.z = 0;
+
+	object.transform.rot.x = (M_PI/180);
+	object.transform.rot.y = 0;
+	object.transform.rot.z = 0;
+
+	object.transform.scale.x = 1;
+	object.transform.scale.y = 1;
+	object.transform.scale.z = 1;
 	
 	while(run){
 		setCursorPosition(0, 0);
 		init_renderer(&renderer, width, height);
 		clear(canvas);
-		//		system("clear");
-
-		check_input(&renderer, &deg, &run);
 		
-		for(int t = 0; t < size; t++) {
-			Triangle triangle = {0};
+		check_input(&renderer, &deg, &run);
 
-			unsigned int i0 = indices[t*3 + 0];
-			unsigned int i1 = indices[t*3 + 1];
-			unsigned int i2 = indices[t*3 + 2];
+		for(size_t i = 0; i < object.triangle_length; i ++){
 
-			// Vertex 0
-			triangle.v0.x = vertices[i0*3 + 0];
-			triangle.v0.y = vertices[i0*3 + 1];
-			triangle.v0.z = vertices[i0*3 + 2];
+			float matrix[4][4];
+			transform_matrix(matrix, object.transform);
+			
+			Triangle triangle = {
+				object.triangles[i].v0,
+				object.triangles[i].v1,
+				object.triangles[i].v2
+			};
 
-			// Vertex 1
-			triangle.v1.x = vertices[i1*3 + 0];
-			triangle.v1.y = vertices[i1*3 + 1];
-			triangle.v1.z = vertices[i1*3 + 2];
+			Vec3 transformed[3];
 
-			// Vertex 2
-			triangle.v2.x = vertices[i2*3 + 0];
-			triangle.v2.y = vertices[i2*3 + 1];
-			triangle.v2.z = vertices[i2*3 + 2];
+			vector_4x4_4((float*)&transformed[0], matrix, (float *)&triangle.v0);
+			vector_4x4_4((float *)&transformed[1], matrix,(float *) &triangle.v1);
+			vector_4x4_4((float *)&transformed[2], matrix,(float *) &triangle.v2);
 
-			render_triangle(canvas, &renderer, &triangle);
+			triangle.v0 = 	transformed[0];
+			triangle.v1 = 	transformed[1];
+			triangle.v2 = 	transformed[2];
+			
+			render_triangle(canvas, &renderer, triangle);
 		}
-
+		
 		render(canvas);
 		msleep(16);
 	}
@@ -134,9 +137,6 @@ int main(int args,char **argv) {
     free(renderer.depth_buffer[y]);
 	}
 	free(renderer.depth_buffer);
-
-	free(vertices);
-	free(indices);
 	
 	return 0;
 }
@@ -147,23 +147,23 @@ void check_input(Renderer *renderer, float *deg, int *run)
 	if(kbhit()){
 			switch(getchar()){
 			case 'a':
-				renderer->camera.camera_pos.data[0] -= 1;
+				renderer->camera.pos.data[0] -= 1;
 				break;
 			case 'd':
-				renderer->camera.camera_pos.data[0] += 1;
+				renderer->camera.pos.data[0] += 1;
 				break;
 			case 'w':
-				renderer->camera.camera_pos.data[1] += 1;
+				renderer->camera.pos.data[1] += 1;
 				break;
 			case 's':
-				renderer->camera.camera_pos.data[1] -= 1;
+				renderer->camera.pos.data[1] -= 1;
 				break;
 			case '+':
 			case '=':
-				renderer->camera.camera_pos.data[2] -= 1;
+				renderer->camera.pos.data[2] -= 1;
 				break;
 			case '-':
-				renderer->camera.camera_pos.data[2] += 1;
+				renderer->camera.pos.data[2] += 1;
 				break;
 			case 'f':
 				(*deg) += 1;
