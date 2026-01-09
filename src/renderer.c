@@ -89,44 +89,30 @@ void mat4_mul(float out[4][4], float a[4][4], float b[4][4]) {
 }
 
 void transform_matrix(float matrix[4][4], Transform t) {
+
+	
     float sx = t.scale.x, sy = t.scale.y, sz = t.scale.z;
     float cx = cosf(t.rot.x), sxr = sinf(t.rot.x);
     float cy = cosf(t.rot.y), syr = sinf(t.rot.y);
     float cz = cosf(t.rot.z), szr = sinf(t.rot.z);
 
-    // Scale matrix
-    float S[4][4]; mat4_identity(S);
-    S[0][0] = sx; S[1][1] = sy; S[2][2] = sz;
+    // Combined Rotation (Z * Y * X) and Scale
+    matrix[0][0] = sx * (cy * cz);
+    matrix[0][1] = sy * (cz * sxr * syr - cx * szr);
+    matrix[0][2] = sz * (cx * cz * syr + sxr * szr);
+    matrix[0][3] = t.pos.x; // Translation
 
-    // Rotation X
-    float Rx[4][4]; mat4_identity(Rx);
-    Rx[1][1] = cx; Rx[1][2] = -sxr;
-    Rx[2][1] = sxr; Rx[2][2] = cx;
+    matrix[1][0] = sx * (cy * szr);
+    matrix[1][1] = sy * (cx * cz + sxr * syr * szr);
+    matrix[1][2] = sz * (cx * syr * szr - cz * sxr);
+    matrix[1][3] = t.pos.y; // Translation
 
-    // Rotation Y
-    float Ry[4][4]; mat4_identity(Ry);
-    Ry[0][0] = cy; Ry[0][2] = syr;
-    Ry[2][0] = -syr; Ry[2][2] = cy;
+    matrix[2][0] = sx * (-syr);
+    matrix[2][1] = sy * (cy * sxr);
+    matrix[2][2] = sz * (cx * cy);
+    matrix[2][3] = t.pos.z; // Translation
 
-    // Rotation Z
-    float Rz[4][4]; mat4_identity(Rz);
-    Rz[0][0] = cz; Rz[0][1] = -szr;
-    Rz[1][0] = szr; Rz[1][1] = cz;
-
-    // Combine rotations R = Rz * Ry * Rx
-    float R[4][4]; mat4_identity(R);
-    mat4_mul(R, Rz, Ry);
-    mat4_mul(R, R, Rx);
-
-    // Apply scale: R = R * S
-    mat4_mul(R, R, S);
-
-    // Translation matrix
-    float T[4][4]; mat4_identity(T);
-    T[0][3] = t.pos.x; T[1][3] = t.pos.y; T[2][3] = t.pos.z;
-
-    // Final matrix M = T * R * S
-    mat4_mul(matrix, T, R);
+    matrix[3][0] = 0; matrix[3][1] = 0; matrix[3][2] = 0; matrix[3][3] = 1;
 }
 
 void render_triangle(Canvas *canvas, Renderer *renderer, Triangle triangle) {

@@ -23,16 +23,19 @@ int load_object(Object *object, const char* path) {
 		triangle.v0.x = vertices[i0*3 + 0];
 		triangle.v0.y = vertices[i0*3 + 1];
 		triangle.v0.z = vertices[i0*3 + 2];
+		triangle.v0.w = 1;
 
 		// Vertex 1
 		triangle.v1.x = vertices[i1*3 + 0];
 		triangle.v1.y = vertices[i1*3 + 1];
 		triangle.v1.z = vertices[i1*3 + 2];
+		triangle.v1.w = 1;
 
 		// Vertex 2
 		triangle.v2.x = vertices[i2*3 + 0];
 		triangle.v2.y = vertices[i2*3 + 1];
 		triangle.v2.z = vertices[i2*3 + 2];
+		triangle.v2.w = 1;
 
 		object->triangles[t] = triangle;
 		object->triangle_length++;

@@ -83,11 +83,12 @@ int main(int args,char **argv) {
 	Object object = {0};
 	load_object(&object, argv[1]);
 
-	object.transform.pos.x = 100;
+	object.transform.pos.x = 0;
 	object.transform.pos.y = 0;
 	object.transform.pos.z = 0;
 
-	object.transform.rot.x = (M_PI/180);
+	
+	object.transform.rot.x = 0;//(M_PI/180);
 	object.transform.rot.y = 0;
 	object.transform.rot.z = 0;
 
@@ -101,7 +102,7 @@ int main(int args,char **argv) {
 		clear(canvas);
 		
 		check_input(&renderer, &deg, &run);
-
+		
 		for(size_t i = 0; i < object.triangle_length; i ++){
 
 			float matrix[4][4];
@@ -113,18 +114,20 @@ int main(int args,char **argv) {
 				object.triangles[i].v2
 			};
 
-			Vec3 transformed[3];
 
+			Vec3 transformed[3];
 			vector_4x4_4((float*)&transformed[0], matrix, (float *)&triangle.v0);
 			vector_4x4_4((float *)&transformed[1], matrix,(float *) &triangle.v1);
 			vector_4x4_4((float *)&transformed[2], matrix,(float *) &triangle.v2);
-
+			
 			triangle.v0 = 	transformed[0];
 			triangle.v1 = 	transformed[1];
 			triangle.v2 = 	transformed[2];
 			
 			render_triangle(canvas, &renderer, triangle);
 		}
+
+		object.transform.rot.x += 0.05f;
 		
 		render(canvas);
 		msleep(16);
