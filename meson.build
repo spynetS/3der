@@ -29,9 +29,11 @@ exe = executable(
   install : true,
 )
 
+test_sources = ['tests/main.c',	'src/canvas.c', 'src/msc.c']
+
 test = executable(
   '3d-tests',
-  'tests/main.c',
+	test_sources,
   dependencies : dependencies,
   install : true,
 )

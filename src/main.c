@@ -63,8 +63,8 @@ int main(int args,char **argv) {
 
 	// load obj
 
-	int width = termWidth();
-	int height = termHeight();
+	int width = termWidth()-10;
+	int height = termHeight()-10;
 	
 	//init renderer
 	Renderer renderer = {0};
@@ -131,6 +131,18 @@ int main(int args,char **argv) {
 		object.transform.rot.y += 0.02f;
 		// object.transform.rot.y += 0.05f; 
 		object.transform.rot.z += 0.02f;
+
+
+		char camera_pos[64];
+		sprintf(camera_pos, "POS: <%f,%f,%f>", renderer.camera.pos.x,renderer.camera.pos.y,renderer.camera.pos.z);
+		set_text(canvas, 2, 2,10 , camera_pos);
+		char camera_rot[64];
+		sprintf(camera_rot, "ROT: <%f,%f,%f>", renderer.camera.rot.x,renderer.camera.rot.y,renderer.camera.rot.z);
+		set_text(canvas, 2, 2+2*8,10 , camera_rot);
+		char camera_fov[64];
+		sprintf(camera_fov, "FOV: <%f>", renderer.camera.f);
+		set_text(canvas, 2, 2+3*8,10 , camera_fov);
+
 		
 		render(canvas);
 		msleep(16);

@@ -1,15 +1,16 @@
 #include <stdio.h>
 #include "../src/vector.h"
+#include "../src/canvas.h"
 
 int main() {
 
-	Vec3 u;
-	u.x = 10;
-	u.y = 10;
-	u.z = 10;
+	Canvas *canvas = new_canvas(100,100);
 
-	printf("%f %f %f\n", u.data[0], u.data[1], u.data[2]);
-	printf("%f %f %f\n", u.x, u.y, u.z);
+	
+	set_text(canvas, 2,2,10,"Hello World!");
+	render(canvas);
+
+	free_canvas(canvas);
 	
 	return 0;
 }

@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include "./font8x8_basic.h"
 
 
 
@@ -59,6 +60,34 @@ void print_pixel(Pixel bottom) {
     printf("\x1b[48;2;%d;%d;%dm ",bottom.r, bottom.g, bottom.b);
 }
 
+void render_text(unsigned int x, unsigned int y, const char* str){
+	setCharAt(x, y, str);
+}
+
+void set_text(Canvas* canvas, unsigned int x, unsigned int y, unsigned int height ,const char* str) {
+	while(*str){
+		setCursorPosition(x, y);
+		int local_y = 0;
+		for(int i = 0; i < 8; i ++){
+			int chari = font8x8_basic[*str][i];
+			int local_x = 0;
+
+			for (int i = 0; i <= 7; i++) {
+				//        printf("%c", ((chari >> i) & 1) ? '#' : '-');
+				if(((chari >> i) & 1)){
+					set_pixel(canvas, x+local_x,y+local_y,255,255,255);
+					fflush(stdout);
+				}
+				local_x++;
+			}
+			local_y++;
+		}
+		x += 8;
+		str++;
+		
+	}
+}
+
 
 void render(Canvas *canvas) {
 	for(unsigned int y = 0; y < canvas->height; y ++) {
@@ -89,6 +118,7 @@ void clear(Canvas *canvas){
 	for (int i = 0; i < canvas->length; i++) {
 		canvas->buffer2[i] = canvas->bg;
 	}
+	//canvas->force_rerender = 1;
 }
 
 void free_canvas(Canvas *canvas) {
