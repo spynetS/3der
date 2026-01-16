@@ -15,13 +15,13 @@ void init_cam(Camera *camera){
 	
 	camera->pos.x = 0;
 	camera->pos.y = 0;
-	camera->pos.z = 0;
+	camera->pos.z = -10;
 
 	camera->rot.x = 0;
 	camera->rot.y = 0;
 	camera->rot.z = 0;
 
-	set_fov(camera, 60);
+	set_fov(camera, 45);
 	
 	camera->zfar = 100;
 	camera->znear = 0.1f;
@@ -127,8 +127,10 @@ int main(int args,char **argv) {
 			render_triangle(canvas, &renderer, triangle);
 		}
 
-		//		object.transform.rot.x += 0.02f;
-		object.transform.rot.y += 0.05f;
+		object.transform.rot.x += 0.02f;
+		object.transform.rot.y += 0.02f;
+		// object.transform.rot.y += 0.05f; 
+		object.transform.rot.z += 0.02f;
 		
 		render(canvas);
 		msleep(16);
@@ -151,23 +153,23 @@ void check_input(Renderer *renderer, float *deg, int *run)
 	if(kbhit()){
 			switch(getchar()){
 			case 'a':
-				renderer->camera.pos.data[0] -= 1;
+				renderer->camera.pos.data[0] -= 0.1f;
 				break;
 			case 'd':
-				renderer->camera.pos.data[0] += 1;
+				renderer->camera.pos.data[0] += 0.1f;
 				break;
 			case 'w':
-				renderer->camera.pos.data[1] += 1;
+				renderer->camera.pos.data[1] += 0.1f;
 				break;
 			case 's':
-				renderer->camera.pos.data[1] -= 1;
+				renderer->camera.pos.data[1] -= 0.1f;
 				break;
 			case '+':
 			case '=':
-				renderer->camera.pos.data[2] -= 1;
+				renderer->camera.pos.data[2] -= 0.1f;
 				break;
 			case '-':
-				renderer->camera.pos.data[2] += 1;
+				renderer->camera.pos.data[2] += 0.1f;
 				break;
 			case 'f':
 				(*deg) += 1;

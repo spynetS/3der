@@ -5,8 +5,8 @@
 #include "loader.h"
 
 int load_object(Object *object, const char* path) {
-	float *vertices = malloc(sizeof(float) * 4024*4);
-	unsigned int *indices = malloc(sizeof(unsigned int) * 4024*4);
+	float *vertices = malloc(sizeof(float) * 4024*256);
+	unsigned int *indices = malloc(sizeof(unsigned int) * 4024*256);
 	int size = 0;
 	load_obj(vertices,indices, &size, path);
 
@@ -46,8 +46,8 @@ int load_object(Object *object, const char* path) {
 }
 
 int load_obj(float *vertices, unsigned int *indices, int *size, const char* path) {
-	float *_vertices = malloc(sizeof(float) * 4024*4);
-	unsigned int *_indices = malloc(sizeof(unsigned int) * 4024*4);
+	float *_vertices = malloc(sizeof(float) * 4024*256);
+	unsigned int *_indices = malloc(sizeof(unsigned int) * 4024*256);
 
 	FILE* obj;
 	obj = fopen(path,"r");
