@@ -15,6 +15,7 @@ typedef struct {
 	int length;
 	unsigned int width;
 	unsigned int height;
+	Pixel bg;
 	int force_rerender;
 } Canvas;
 

@@ -24,6 +24,7 @@ Canvas *new_canvas(unsigned int width, unsigned int height) {
 	Canvas *canvas = malloc(sizeof(Canvas));
 	if (!canvas) return NULL;
 
+	canvas->bg = (Pixel){0,0,0};
 	canvas->force_rerender = 0;
 	canvas->width = width;
 	canvas->height = height;
@@ -86,9 +87,7 @@ void render(Canvas *canvas) {
 
 void clear(Canvas *canvas){
 	for (int i = 0; i < canvas->length; i++) {
-		canvas->buffer2[i].r = 0;
-		canvas->buffer2[i].g = 0;
-		canvas->buffer2[i].b = 0;
+		canvas->buffer2[i] = canvas->bg;
 	}
 }
 

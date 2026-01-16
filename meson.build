@@ -29,4 +29,12 @@ exe = executable(
   install : true,
 )
 
+test = executable(
+  '3d-tests',
+  'tests/main.c',
+  dependencies : dependencies,
+  install : true,
+)
+
+
 test('basic', exe)

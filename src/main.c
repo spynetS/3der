@@ -8,28 +8,27 @@
 #include "renderer.h"
 #include "canvas.h"
 #include "msc.h"
+#include "loader.h"
 
-// from loader.c
-int load_obj(float *vertices, unsigned int *indices, int *size, const char* path);
 
 void init_cam(Camera *camera){
 	
-	camera->camera_pos[0] = 0;
-	camera->camera_pos[1] = 0;
-	camera->camera_pos[2] = 0;
+	camera->pos.x = 0;
+	camera->pos.y = 0;
+	camera->pos.z = -10;
 
-	camera->rot[0] = 0;
-	camera->rot[1] = 0;
-	camera->rot[2] = 0;
+	camera->rot.x = 0;
+	camera->rot.y = 0;
+	camera->rot.z = 0;
 
-	set_fov(camera, 60);
+	set_fov(camera, 45);
 	
 	camera->zfar = 100;
 	camera->znear = 0.1f;
 	
-	camera->camera_up[0] = 0;
-	camera->camera_up[1] = 1;
-	camera->camera_up[2] = 0;
+	camera->camera_up.x = 0;
+	camera->camera_up.y = 1;
+	camera->camera_up.z = 0;
 }
 
 void init_renderer(Renderer *renderer, int width, int height){
@@ -63,10 +62,6 @@ int main(int args,char **argv) {
 	if(args <= 1) printf("No model provided!\n");
 
 	// load obj
-	float *vertices = malloc(sizeof(float) * 4024*4);
-	unsigned int *indices = malloc(sizeof(unsigned int) * 4024*4);
-	int size = 0;
-	load_obj(vertices,indices, &size, argv[1]);
 
 	int width = termWidth();
 	int height = termHeight();
@@ -78,51 +73,65 @@ int main(int args,char **argv) {
 
 	// init canvas
 	Canvas *canvas = new_canvas(width, height);
-	for(int i = 0 ; i < canvas->width * canvas->height; i ++){
-		canvas->buffer2[i].r = 0;
-		canvas->buffer2[i].g = 0;
-		canvas->buffer2[i].b = 0;
-	}
+	canvas->bg = (Pixel){0,0,100};
 	canvas->force_rerender = 1;
 	render(canvas);
 	canvas->force_rerender = 0;
 	
 	float deg = 60;
 	int run = 1;
+	Object object = {0};
+	load_object(&object, argv[1]);
+
+	object.transform.pos.x = 0;
+	object.transform.pos.y = 0;
+	object.transform.pos.z = -2;
+
+	
+	object.transform.rot.x = 90*(M_PI/180);//(M_PI/180);
+	object.transform.rot.y = 0;
+	object.transform.rot.z = 0;
+
+	object.transform.scale.x = 1;
+	object.transform.scale.y = 1;
+	object.transform.scale.z = 1;
 	
 	while(run){
 		setCursorPosition(0, 0);
 		init_renderer(&renderer, width, height);
 		clear(canvas);
-		//		system("clear");
-
+		
 		check_input(&renderer, &deg, &run);
 		
-		for(int t = 0; t < size; t++) {
-			Triangle triangle = {0};
+		for(size_t i = 0; i < object.triangle_length; i ++){
 
-			unsigned int i0 = indices[t*3 + 0];
-			unsigned int i1 = indices[t*3 + 1];
-			unsigned int i2 = indices[t*3 + 2];
+			float matrix[4][4];
+			transform_matrix(matrix, object.transform);
+			
+			Triangle triangle = {
+				object.triangles[i].v0,
+				object.triangles[i].v1,
+				object.triangles[i].v2
+			};
 
-			// Vertex 0
-			triangle.v0[0] = vertices[i0*3 + 0];
-			triangle.v0[1] = vertices[i0*3 + 1];
-			triangle.v0[2] = vertices[i0*3 + 2];
 
-			// Vertex 1
-			triangle.v1[0] = vertices[i1*3 + 0];
-			triangle.v1[1] = vertices[i1*3 + 1];
-			triangle.v1[2] = vertices[i1*3 + 2];
-
-			// Vertex 2
-			triangle.v2[0] = vertices[i2*3 + 0];
-			triangle.v2[1] = vertices[i2*3 + 1];
-			triangle.v2[2] = vertices[i2*3 + 2];
-
-			render_triangle(canvas, &renderer, &triangle);
+			Vec3 transformed[3];
+			vector_4x4_4((float*)&transformed[0], matrix, (float *)&triangle.v0);
+			vector_4x4_4((float *)&transformed[1], matrix,(float *) &triangle.v1);
+			vector_4x4_4((float *)&transformed[2], matrix,(float *) &triangle.v2);
+			
+			triangle.v0 = 	transformed[0];
+			triangle.v1 = 	transformed[1];
+			triangle.v2 = 	transformed[2];
+			
+			render_triangle(canvas, &renderer, triangle);
 		}
 
+		object.transform.rot.x += 0.02f;
+		object.transform.rot.y += 0.02f;
+		// object.transform.rot.y += 0.05f; 
+		object.transform.rot.z += 0.02f;
+		
 		render(canvas);
 		msleep(16);
 	}
@@ -134,9 +143,6 @@ int main(int args,char **argv) {
     free(renderer.depth_buffer[y]);
 	}
 	free(renderer.depth_buffer);
-
-	free(vertices);
-	free(indices);
 	
 	return 0;
 }
@@ -147,23 +153,23 @@ void check_input(Renderer *renderer, float *deg, int *run)
 	if(kbhit()){
 			switch(getchar()){
 			case 'a':
-				renderer->camera.camera_pos[0] -= 1;
+				renderer->camera.pos.data[0] -= 0.1f;
 				break;
 			case 'd':
-				renderer->camera.camera_pos[0] += 1;
+				renderer->camera.pos.data[0] += 0.1f;
 				break;
 			case 'w':
-				renderer->camera.camera_pos[1] += 1;
+				renderer->camera.pos.data[1] += 0.1f;
 				break;
 			case 's':
-				renderer->camera.camera_pos[1] -= 1;
+				renderer->camera.pos.data[1] -= 0.1f;
 				break;
 			case '+':
 			case '=':
-				renderer->camera.camera_pos[2] -= 1;
+				renderer->camera.pos.data[2] -= 0.1f;
 				break;
 			case '-':
-				renderer->camera.camera_pos[2] += 1;
+				renderer->camera.pos.data[2] += 0.1f;
 				break;
 			case 'f':
 				(*deg) += 1;
@@ -174,16 +180,16 @@ void check_input(Renderer *renderer, float *deg, int *run)
 				set_fov(&renderer->camera, (*deg));
 				break;
 			case '8':
-				renderer->camera.rot[0] += 1;
+				renderer->camera.rot.data[0] += 1;
 				break;
 			case '2':
-				renderer->camera.rot[0] -= 1;
+				renderer->camera.rot.data[0] -= 1;
 				break;
 			case '4':
-				renderer->camera.rot[1] += 1;
+				renderer->camera.rot.data[1] += 1;
 				break;
 			case '6':
-				renderer->camera.rot[1] -= 1;
+				renderer->camera.rot.data[1] -= 1;
 				break;
 			case 'q':
 				(*run) = 0;
