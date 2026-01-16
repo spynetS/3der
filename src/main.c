@@ -95,8 +95,15 @@ int main(int args,char **argv) {
 	object.transform.scale.x = 1;
 	object.transform.scale.y = 1;
 	object.transform.scale.z = 1;
-	
+
+
+	float fps = 0;
 	while(run){
+		clock_t start, end;
+		double cpu_time_used;
+    
+		start = clock();
+
 		setCursorPosition(0, 0);
 		init_renderer(&renderer, width, height);
 		clear(canvas);
@@ -128,26 +135,37 @@ int main(int args,char **argv) {
 		}
 
 		object.transform.rot.x += 0.02f;
-		object.transform.rot.y += 0.02f;
-		// object.transform.rot.y += 0.05f; 
-		object.transform.rot.z += 0.02f;
+				object.transform.rot.y += 0.02f;
+				//object.transform.rot.y += 0.05f; 
+				//		object.transform.rot.z += 0.02f;
 
 
+		char fps_text[64];
+		sprintf(fps_text, "FPS: %f", fps);
+		set_text(canvas, 2, 2,10 , fps_text);
+				
+		
 		char camera_pos[64];
 		sprintf(camera_pos, "POS: <%f,%f,%f>", renderer.camera.pos.x,renderer.camera.pos.y,renderer.camera.pos.z);
-		set_text(canvas, 2, 2,10 , camera_pos);
+		set_text(canvas, 2,2+2*8,10 , camera_pos);
+
 		char camera_rot[64];
 		sprintf(camera_rot, "ROT: <%f,%f,%f>", renderer.camera.rot.x,renderer.camera.rot.y,renderer.camera.rot.z);
-		set_text(canvas, 2, 2+2*8,10 , camera_rot);
+		set_text(canvas, 2, 2+3*8,10 , camera_rot);
+
 		char camera_fov[64];
 		sprintf(camera_fov, "FOV: <%f>", renderer.camera.f);
-		set_text(canvas, 2, 2+3*8,10 , camera_fov);
+		set_text(canvas, 2, 2+4*8,10 , camera_fov);
 
 		
 		render(canvas);
 		msleep(16);
+		end = clock();
+		fps = CLOCKS_PER_SEC / (double)(end - start);
+		
 	}
 
+	
 	// FREE A BUNCH
 	free_canvas(canvas);
 
