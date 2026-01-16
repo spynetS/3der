@@ -180,16 +180,16 @@ void check_input(Renderer *renderer, float *deg, int *run)
 				set_fov(&renderer->camera, (*deg));
 				break;
 			case '8':
-				renderer->camera.rot.data[0] += 1;
+				renderer->camera.rot.data[0] += 0.1f;
 				break;
 			case '2':
-				renderer->camera.rot.data[0] -= 1;
+				renderer->camera.rot.data[0] -= 0.1f;
 				break;
 			case '4':
-				renderer->camera.rot.data[1] += 1;
+				renderer->camera.rot.data[1] += 0.1f;
 				break;
 			case '6':
-				renderer->camera.rot.data[1] -= 1;
+				renderer->camera.rot.data[1] -= 0.1f;
 				break;
 			case 'q':
 				(*run) = 0;

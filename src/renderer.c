@@ -62,10 +62,46 @@ double max (double a, double b) {
 	return a > b ? a : b;
 }
 
+void rotate_vertex(Vec3 *v, Camera *camera);
+
 void to_view(Triangle *triangle, Camera *camera) {
 	vector_subtract(&triangle->v0, &triangle->v0,&camera->pos);
 	vector_subtract(&triangle->v1, &triangle->v1,&camera->pos);
 	vector_subtract(&triangle->v2, &triangle->v2,&camera->pos);
+    // Step 2: Rotate by camera orientation
+	rotate_vertex(&triangle->v0, camera);
+	rotate_vertex(&triangle->v1, camera);
+	rotate_vertex(&triangle->v2, camera);
+}
+
+void rotate_vertex(Vec3 *v, Camera *camera) {
+    Vec3 temp;
+    
+    // Rotate around Y axis (yaw)
+    float cos_yaw = cosf(-camera->rot.y);
+    float sin_yaw = sinf(-camera->rot.y);
+    temp.x = v->x * cos_yaw - v->z * sin_yaw;
+    temp.z = v->x * sin_yaw + v->z * cos_yaw;
+    v->x = temp.x;
+    v->z = temp.z;
+    
+    // Rotate around X axis (pitch)
+    float cos_pitch = cosf(-camera->rot.x);
+    float sin_pitch = sinf(-camera->rot.x);
+    temp.y = v->y * cos_pitch - v->z * sin_pitch;
+    temp.z = v->y * sin_pitch + v->z * cos_pitch;
+    v->y = temp.y;
+    v->z = temp.z;
+    
+    // Rotate around Z axis (roll) - optional
+    if (camera->rot.z != 0) {
+        float cos_roll = cosf(-camera->rot.z);
+        float sin_roll = sinf(-camera->rot.z);
+        temp.x = v->x * cos_roll - v->y * sin_roll;
+        temp.y = v->x * sin_roll + v->y * cos_roll;
+        v->x = temp.x;
+        v->y = temp.y;
+    }
 }
 
 void mat4_identity(float m[4][4]) {
